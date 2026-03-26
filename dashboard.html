@@ -2,160 +2,61 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KOVALIOSKY | Trading & Security Hub</title>
+    <title>Trading Intelligence Hub</title>
     <style>
-        :root {
-            --neon-green: #00ff41;
-            --dark-bg: #050505;
-            --card-bg: rgba(0, 20, 0, 0.9);
+        body { background-color: #0a0a0a; color: #00ff41; font-family: 'Courier New', monospace; margin: 20px; }
+        .chart-container { 
+            border: 2px solid #003300; 
+            height: 600px; 
+            margin-bottom: 20px;
+            transition: all 0.5s ease;
         }
-
-        body { 
-            background: var(--dark-bg); 
-            color: var(--neon-green); 
-            font-family: 'Courier New', monospace; 
-            margin: 0; 
-            overflow: hidden; 
-            height: 100vh;
-        }
-
-        .main-container {
-            display: grid;
-            grid-template-columns: 1fr 380px;
-            height: 100vh;
-        }
-
-        /* Seção do Gráfico */
-        .chart-container {
-            border-right: 2px solid #003300;
-            position: relative;
-        }
-
-        /* Sidebar de Inteligência */
-        .sidebar {
-            background: var(--card-bg);
-            padding: 20px;
-            overflow-y: auto;
-            border-left: 1px solid var(--neon-green);
-            box-shadow: -10px 0 20px rgba(0, 255, 65, 0.05);
-        }
-
-        h2 {
-            font-size: 1.1em;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            border-bottom: 1px solid var(--neon-green);
-            padding-bottom: 10px;
-            margin-top: 0;
-            text-shadow: 0 0 8px var(--neon-green);
-        }
-
-        .news-item {
-            border: 1px solid #004400;
-            padding: 12px;
-            margin-bottom: 15px;
-            font-size: 0.85em;
-            background: rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
-        }
-
-        .news-item:hover {
-            border-color: var(--neon-green);
-            background: rgba(0, 255, 65, 0.05);
-            transform: translateX(5px);
-        }
-
-        .news-item b {
-            color: #fff;
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .news-item span {
-            color: #888;
-            font-size: 0.8em;
-        }
-
-        .status-footer {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--neon-green);
-            color: #000;
-            font-size: 0.7em;
-            font-weight: bold;
-            padding: 4px 15px;
-            text-transform: uppercase;
-        }
-
-        /* Scrollbar Style */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: var(--neon-green); }
+        h2 { border-bottom: 1px solid #00ff41; padding-bottom: 10px; }
     </style>
 </head>
 <body>
-
-<div class="main-container">
-    <section class="chart-container">
-        <div id="tradingview_widget" style="height: 100%;"></div>
-        <div class="status-footer">
-            [SYS_READY] :: MODE: SCALPING_30M :: TARGET: BTCUSDT :: FIREWALL: ACTIVE
+    <h2>🚀 BITCOIN INTELLIGENCE - 30M FEED</h2>
+    
+    <div class="chart-container" id="tradingview_chart">
+        <div class="tradingview-widget-container">
+            <div id="tradingview_btc"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+            <script type="text/javascript">
+                new TradingView.widget({
+                    "width": "100%", "height": 600, "symbol": "BINANCE:BTCUSDT",
+                    "interval": "30", "timezone": "Etc/UTC", "theme": "dark",
+                    "style": "1", "locale": "br", "toolbar_bg": "#f1f3f6",
+                    "enable_publishing": false, "hide_top_toolbar": false,
+                    "save_image": false, "container_id": "tradingview_btc"
+                });
+            </script>
         </div>
-    </section>
+    </div>
 
-    <aside class="sidebar">
-        <h2>Intelligence Feed</h2>
-        <div id="news-feed">Iniciando varredura de dados...</div>
-    </aside>
-</div>
+    <script>
+        // Lógica de Alerta Visual
+        let lastPrice = 0;
+        async function monitorVolatility() {
+            try {
+                const response = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
+                const data = await response.json();
+                const currentPrice = parseFloat(data.price);
+                const container = document.getElementById('tradingview_chart');
 
-<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-<script>
-    // Configuração do Gráfico de 30 Minutos (Padrão Senior Trader)
-    new TradingView.widget({
-        "autosize": true,
-        "symbol": "BINANCE:BTCUSDT",
-        "interval": "30",
-        "timezone": "America/Sao_Paulo",
-        "theme": "dark",
-        "style": "1",
-        "locale": "br",
-        "toolbar_bg": "#050505",
-        "enable_publishing": false,
-        "hide_top_toolbar": false,
-        "save_image": false,
-        "container_id": "tradingview_widget"
-    });
-
-    // Consumo da API do seu novo repositório
-    async function fetchIntelligence() {
-        const feed = document.getElementById('news-feed');
-        try {
-            const response = await fetch('http://localhost:3000/news');
-            const data = await response.json();
-            
-            if (data.articles && data.articles.length > 0) {
-                feed.innerHTML = data.articles.map(art => `
-                    <div class="news-item">
-                        <b>> ${art.title}</b>
-                        <span>Fonte: ${art.source.name} | ${new Date(art.publishedAt).toLocaleTimeString()}</span>
-                    </div>
-                `).join('');
-            } else {
-                feed.innerHTML = "Aguardando novas entradas de dados...";
-            }
-        } catch (err) {
-            feed.innerHTML = "<span style='color:red'>[ERRO]: BACKEND OFFLINE</span>";
+                if (lastPrice > 0) {
+                    const change = ((currentPrice - lastPrice) / lastPrice) * 100;
+                    if (change >= 0.5) { // Subida forte
+                        container.style.border = "5px solid #00ff41";
+                        container.style.boxShadow = "0 0 20px #00ff41";
+                    } else if (change <= -0.5) { // Queda forte
+                        container.style.border = "5px solid #ff0000";
+                        container.style.boxShadow = "0 0 20px #ff0000";
+                    }
+                }
+                lastPrice = currentPrice;
+            } catch (err) { console.error("Erro na API"); }
         }
-    }
-
-    // Loop de atualização (60 segundos)
-    fetchIntelligence();
-    setInterval(fetchIntelligence, 60000);
-</script>
-
+        setInterval(monitorVolatility, 30000);
+    </script>
 </body>
 </html>
