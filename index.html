@@ -5,29 +5,17 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4389870681468404" crossorigin="anonymous"></script>
     
     <meta charset="UTF-8">
-    <title>Visual Cripto Hub | Full View M30</title>
+    <title>Visual Cripto Hub | M30</title>
     <style>
-        body, html { 
-            background-color: #050505; 
-            margin: 0; padding: 0; 
-            height: 100%; width: 100%; 
-            overflow: hidden; 
-            display: flex; flex-direction: column; 
-        }
-        .header-meta { 
-            display: flex; justify-content: space-between; 
-            padding: 10px 15px; background: #0a0a0a; 
-            border-bottom: 1px solid #00ff41; color: #00ff41; 
-            font-family: 'Courier New', monospace;
-        }
+        body, html { background-color: #050505; margin: 0; height: 100%; width: 100%; overflow: hidden; display: flex; flex-direction: column; }
+        .header-meta { display: flex; justify-content: space-between; padding: 10px; background: #0a0a0a; border-bottom: 1px solid #00ff41; color: #00ff41; font-family: monospace; }
         .chart-container { flex-grow: 1; width: 100%; position: relative; }
-        .alert-active { box-shadow: inset 0 0 50px #ff0000; border: 4px solid #ff0000; }
-        footer { font-size: 10px; color: #004400; text-align: center; padding: 5px; background: #050505; }
+        footer { font-size: 10px; color: #004400; text-align: center; padding: 5px; }
     </style>
 </head>
 <body>
     <div class="header-meta">
-        <span>🚀 VISUAL CRIPTO HUB - M30 [OFFUSCATED]</span>
+        <span>🚀 VISUAL CRIPTO HUB - M30</span>
         <span id="status">STATUS: MONITORANDO...</span>
     </div>
 
@@ -35,50 +23,28 @@
         <div id="tradingview_widget" style="height: 100%; width: 100%;"></div>
     </div>
 
-    <audio id="alert_sound" src="https://www.soundjay.com/buttons/beep-07a.mp3" preload="auto"></audio>
-
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script>
-        // Ofuscação Base64 para proteção contra scrapers do GitHub
-        const _0x4a2 = "ODczNTg4NTQ2OTpBQUdnb2JnLVB2VV9XUFA0d2lKNldZRDB6Z1dwLVBLbDdPMA==";
-        const _0x9b1 = "NTI5NTU1ODkwNg==";
-
-        const TOKEN = atob(_0x4a2);
-        const CHAT_ID = atob(_0x9b1);
-
+        // 1. INICIALIZA O GRÁFICO (TEXTO PURO)
         new TradingView.widget({
             "autosize": true,
             "symbol": "BINANCE:BTCUSDT",
             "interval": "30",
             "theme": "dark",
-            "style": "1",
-            "container_id": "tradingview_widget",
-            "timezone": "America/Sao_Paulo",
-            "hide_side_toolbar": false,
-            "allow_symbol_change": true,
-            "details": true
+            "container_id": "tradingview_widget"
         });
 
-        let lastPrice = 0;
-        async function checkPrice() {
-            try {
-                const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
-                const data = await res.json();
-                const price = parseFloat(data.price);
-                const hub = document.getElementById('main_hub');
+        // 2. LÓGICA DO TELEGRAM OFUSCADA (PROTEÇÃO)
+        const _v = "ODczNTg4NTQ2OTpBQUdnb2JnLVB2VV9XUFA0d2lKNldZRDB6Z1dwLVBLbDdPMA=="; // Token
+        const _c = "NTI5NTU1ODkwNg=="; // Chat ID
 
-                if (lastPrice > 0) {
-                    const diff = Math.abs(((price - lastPrice) / lastPrice) * 100);
-                    if (diff >= 0.05) { 
-                        document.getElementById('alert_sound').play().catch(()=>{});
-                        hub.className = 'chart-container alert-active';
-                        fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=⚠️ Alerta de Volatilidade: $${price}`);
-                    } else { hub.className = 'chart-container'; }
-                }
-                lastPrice = price;
-            } catch (e) {}
+        async function check() {
+            const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
+            const d = await res.json();
+            // Lógica de alerta aqui...
+            // fetch(`https://api.telegram.org/bot${atob(_v)}/sendMessage?chat_id=${atob(_c)}&text=Alerta...`);
         }
-        setInterval(checkPrice, 10000);
+        setInterval(check, 10000);
     </script>
     <footer>© 2026 Visual Studio & Security | Guilherme Kovaliosky</footer>
 </body>
