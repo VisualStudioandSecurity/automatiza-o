@@ -1,23 +1,22 @@
 <!DOCTYPE html>
-<html lang="pt-pt">
+<html lang="pt-br">
 <head>
     <script src="https://js.sentry-cdn.com/cf23f8572e034177f2c923d5eca7f89c.min.js" crossorigin="anonymous"></script>
     <meta charset="UTF-8">
-    <title>Visual Cripto Hub | High Performance</title>
+    <title>Visual Cripto Hub | M30</title>
     <style>
-        body { background-color: #050505; color: #00f2ff; font-family: 'Courier New', monospace; margin: 20px; display: flex; flex-direction: column; min-height: 100vh; }
-        .header-meta { display: flex; justify-content: space-between; border-bottom: 1px solid #00f2ff; padding-bottom: 5px; font-weight: bold; }
-        .chart-container { border: 2px solid #0d0d0d; height: 650px; transition: all 0.3s ease; margin-top: 10px; position: relative; }
-        .alert-active { border: 4px solid #ff003c; box-shadow: 0 0 30px #ff003c; }
-        .gain-active { border: 4px solid #00f2ff; box-shadow: 0 0 30px #00f2ff; }
-        footer { text-align: center; padding: 20px; border-top: 1px solid #1a1a1a; margin-top: auto; font-size: 0.8rem; color: #555; }
-        #status-indicator { color: #ff003c; font-weight: 900; }
+        body { background-color: #0a0a0a; color: #00ff41; font-family: 'Courier New', monospace; margin: 20px; display: flex; flex-direction: column; min-height: 100vh; }
+        .header-meta { display: flex; justify-content: space-between; border-bottom: 1px solid #00ff41; padding-bottom: 5px; }
+        .chart-container { border: 2px solid #003300; height: 600px; margin-top: 10px; flex-grow: 1; position: relative; }
+        .alert-active { border: 5px solid #ff0000; box-shadow: 0 0 20px #ff0000; }
+        .gain-active { border: 5px solid #00ff41; box-shadow: 0 0 20px #00ff41; }
+        footer { text-align: center; padding: 15px; border-top: 1px solid #003300; margin-top: auto; font-size: 0.8rem; color: #008800; }
     </style>
 </head>
 <body>
     <div class="header-meta">
-        <span>🚀 VISUAL CRIPTO HUB [M30 MONITOR]</span>
-        <span id="ping">LATÊNCIA: -- MS</span>
+        <span>🚀 VISUAL CRIPTO HUB - M30</span>
+        <span id="ping">Status: Monitorando...</span>
     </div>
 
     <div class="chart-container" id="main_hub">
@@ -26,52 +25,64 @@
 
     <audio id="alert_sound" src="https://www.soundjay.com/buttons/beep-07a.mp3" preload="auto"></audio>
 
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script>
-    // Configurações Atualizadas
-    const TELEGRAM_TOKEN = '8735885469:AAGgobg-PvU_WPP4wiJ6WYD0zgWp-PKl7O0'; 
-    const TELEGRAM_CHAT_ID = '5295558906'; 
+        // Configurações Kovaliosky
+        const TOKEN = '8735885469:AAGgobg-PvU_WPP4wiJ6WYD0zgWp-PKl7O0';
+        const CHAT_ID = '5295558906';
+        let lastPrice = 0;
 
-    const alertAudio = document.getElementById('alert_sound');
-    let lastPrice = 0;
+        // 1. CARREGAR GRÁFICO (Para evitar a tela preta)
+        new TradingView.widget({
+            "width": "100%", "height": "100%", "symbol": "BINANCE:BTCUSDT",
+            "interval": "30", "theme": "dark", "container_id": "tradingview_btc"
+        });
 
-    async function notifyTelegram(msg) {
-        try {
-            await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg })
-            });
-        } catch (e) { console.error("Erro Telegram"); }
-    }
+        // 2. FUNÇÃO DE NOTIFICAÇÃO
+        async function sendTelegram(msg) {
+            try {
+                await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
+                });
+            } catch (e) { console.error("Erro Telegram"); }
+        }
 
-    async function updateHub() {
-        try {
-            const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
-            const data = await res.json();
-            const price = parseFloat(data.price);
-            const container = document.getElementById('main_hub');
+        // 3. MONITOR DE PREÇO E APITO
+        async function updateHub() {
+            try {
+                const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
+                const data = await res.json();
+                const price = parseFloat(data.price);
+                const container = document.getElementById('main_hub');
+                const audio = document.getElementById('alert_sound');
 
-            if (lastPrice > 0) {
-                const change = ((price - lastPrice) / lastPrice) * 100;
+                if (lastPrice > 0) {
+                    const diff = Math.abs(((price - lastPrice) / lastPrice) * 100);
 
-                // SENSIBILIDADE DE TESTE: 0.001 (Vai apitar quase o tempo todo)
-                if (Math.abs(change) >= 0.001) { 
-                    alertAudio.play().catch(() => console.log("Clique na página para ativar o som!"));
-                    container.className = change > 0 ? 'chart-container gain-active' : 'chart-container alert-active';
-                    
-                    notifyTelegram(`🚀 HUB ATIVO\nPreço: $${price}\nVariação: ${change.toFixed(4)}%`);
+                    // SENSIBILIDADE DE TESTE: 0.001 (Aumente para 0.1 depois)
+                    if (diff >= 0.001) {
+                        audio.play().catch(() => {}); // Tenta apitar
+                        container.className = price > lastPrice ? 'chart-container gain-active' : 'chart-container alert-active';
+                        sendTelegram(`⚠️ Alerta BTC: $${price}`);
+                    } else {
+                        container.className = 'chart-container';
+                    }
                 }
-            }
-            lastPrice = price;
-        } catch (e) { console.error("Erro na API"); }
-    }
+                lastPrice = price;
+            } catch (e) { console.error("Erro API"); }
+        }
 
-    // Checagem rápida a cada 3 segundos para teste
-    setInterval(updateHub, 3000);
-</script>
+        // Inicia o monitoramento
+        setInterval(updateHub, 5000);
+
+        // TESTE INICIAL: Envia mensagem assim que abrir para confirmar que o bot está vivo
+        sendTelegram("🛡️ Visual Cripto Hub Online!");
     </script>
 
     <footer>
-        © 2026 Visual Studio & Security | High Performance Software Development
-        <br>
-        Fundada por
+        © 2026 Visual Studio & Security. Especialista Senior: Guilherme Kovaliosky
+    </footer>
+</body>
+</html>
