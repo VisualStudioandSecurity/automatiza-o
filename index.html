@@ -64,8 +64,8 @@
                 if (lastPrice > 0) {
                     const diff = Math.abs(((price - lastPrice) / lastPrice) * 100);
 
-                    // Sensibilidade de 0.001 para teste sonoro imediato
-                    if (diff >= 0.001) {
+                    // Sensibilidade de 0.2 para teste sonoro imediato
+                    if (diff >= 0.2) {
                         audio.play().catch(() => console.log("Clique na tela para ativar som"));
                         container.className = price > lastPrice ? 'chart-container gain-active' : 'chart-container alert-active';
                         sendTelegram(`⚠️ Alerta BTC: $${price}`);
