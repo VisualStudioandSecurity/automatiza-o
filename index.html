@@ -1,87 +1,83 @@
 <!DOCTYPE html>
-<html lang="pt-pt">
+<html lang="pt-br">
 <head>
-    <script src="https://js.sentry-cdn.com/cf23f8572e034177f2c923d5eca7f89c.min.js" crossorigin="anonymous"></script>
+    <meta name="google-adsense-account" content="ca-pub-4389870681468404">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4389870681468404" crossorigin="anonymous"></script>
+    
     <meta charset="UTF-8">
-    <title>Visual Cripto Hub | High Performance M30</title>
+    <title>Visual Cripto Hub | Full View M30</title>
     <style>
-        /* Define que o corpo da página ocupa a altura total sem barras de rolagem */
+        /* CSS para ocupar 100% da tela sem barras de rolagem */
         body, html { 
             background-color: #050505; 
-            color: #00f2ff; 
-            font-family: 'Courier New', monospace; 
-            margin: 0; 
-            padding: 0; 
-            height: 100%; 
-            overflow: hidden; /* Remove rolagem da página principal */
-            display: flex; 
-            flex-direction: column; 
+            margin: 0; padding: 0; 
+            height: 100%; width: 100%; 
+            overflow: hidden; 
+            display: flex; flex-direction: column; 
         }
-
-        /* Header fixo no topo */
         .header-meta { 
-            display: flex; 
-            justify-content: space-between; 
-            border-bottom: 1px solid #00f2ff; 
-            padding: 5px 20px; 
-            font-weight: bold; 
-            font-size: 0.9rem;
-            background-color: #050505;
-            z-index: 10;
+            display: flex; justify-content: space-between; 
+            padding: 10px 15px; background: #0a0a0a; 
+            border-bottom: 1px solid #00ff41; color: #00ff41; 
+            font-family: 'Courier New', monospace;
         }
-
-        /* Container do gráfico: ocupa todo o espaço restante */
-        .chart-container { 
-            flex-grow: 1; /* Ocupa o resto da altura da flexbox */
-            width: 100%;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        /* Classes de Alerta */
-        .alert-active { box-shadow: inset 0 0 30px #ff003c; border: 2px solid #ff003c; }
-        .gain-active { box-shadow: inset 0 0 30px #00f2ff; border: 2px solid #00f2ff; }
-
-        /* Rodapé fixo no fundo */
-        footer { 
-            text-align: center; 
-            padding: 5px; 
-            border-top: 1px solid #1a1a1a; 
-            font-size: 0.75rem; 
-            color: #555; 
-            background-color: #050505;
-            z-index: 10;
-        }
+        .chart-container { flex-grow: 1; width: 100%; position: relative; }
+        .alert-active { box-shadow: inset 0 0 50px #ff0000; border: 4px solid #ff0000; }
+        footer { font-size: 10px; color: #004400; text-align: center; padding: 5px; background: #050505; }
     </style>
 </head>
 <body>
     <div class="header-meta">
-        <span>🚀 VISUAL CRIPTO HUB [M30 MONITOR]</span>
-        <span id="ping">LATÊNCIA: -- MS</span>
+        <span>🚀 VISUAL CRIPTO HUB - M30</span>
+        <span id="status">STATUS: MONITORANDO...</span>
     </div>
 
     <div class="chart-container" id="main_hub">
-        <div id="tradingview_btc" style="height: 100%; width: 100%;"></div>
+        <div id="tradingview_widget" style="height: 100%; width: 100%;"></div>
     </div>
 
     <audio id="alert_sound" src="https://www.soundjay.com/buttons/beep-07a.mp3" preload="auto"></audio>
 
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script>
-        // Credenciais Kovaliosky confirmadas
-        const TG_TOKEN = '8647035778:AAGe5pkNdG10peE82phy8_hAp0D3VHJ9g7c';
-        const TG_CHAT_ID = '5295558906';
+        const TOKEN = '8735885469:AAGgobg-PvU_WPP4wiJ6WYD0zgWp-PKl7O0'; 
+        const CHAT_ID = '5295558906';
 
-        // Inicializa o Widget - Usando 'autosize' para responsividade total
+        // 'autosize: true' garante que o gráfico redimensione automaticamente
         new TradingView.widget({
-            "autosize": true, // ESSENCIAL: Faz o gráfico ocupar a div pai
+            "autosize": true,
             "symbol": "BINANCE:BTCUSDT",
-            "interval": "30", // Configurado para 30 minutos
+            "interval": "30",
             "theme": "dark",
-            "style": "1", // Velas
-            "container_id": "tradingview_btc",
+            "style": "1",
+            "container_id": "tradingview_widget",
             "timezone": "America/Sao_Paulo",
             "hide_side_toolbar": false,
             "allow_symbol_change": true,
-            "save_image": false,
-            "details":
+            "details": true
+        });
+
+        let lastPrice = 0;
+        async function checkPrice() {
+            try {
+                const res = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT');
+                const data = await res.json();
+                const price = parseFloat(data.price);
+                const hub = document.getElementById('main_hub');
+
+                if (lastPrice > 0) {
+                    const diff = Math.abs(((price - lastPrice) / lastPrice) * 100);
+                    if (diff >= 0.05) { 
+                        document.getElementById('alert_sound').play().catch(()=>{});
+                        hub.className = 'chart-container alert-active';
+                        fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=⚠️ Alerta de Volatilidade: $${price}`);
+                    } else { hub.className = 'chart-container'; }
+                }
+                lastPrice = price;
+            } catch (e) {}
+        }
+        setInterval(checkPrice, 10000);
+    </script>
+    <footer>© 2026 Visual Studio & Security</footer>
+</body>
+</html>
