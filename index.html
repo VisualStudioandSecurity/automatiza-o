@@ -218,19 +218,20 @@
             document.getElementById('signal-panel').innerHTML = `<div class="text-xs font-bold ${rsi > 50 ? 'text-[#00ff41]' : 'text-[#ff3232]'}">${rsi > 50 ? 'STRONG BUY' : 'NEUTRAL'}</div><div class="text-[9px] text-[#444]">RSI (14): ${rsi}</div>`;
         }
 
-       // --- NEWS RSS (SOLUÇÃO DEFINITIVA) ---
+      // --- NEWS RSS (PROVEDOR FEEDNAMI - MAIS ESTÁVEL) ---
         async function fetchNews() {
             const newsContainer = document.getElementById('news-container');
             try {
-                // Usando o serviço rss2json (gratuito e estável para leitura de RSS)
-                const feedUrl = 'https://br.cointelegraph.com/rss';
-                const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
+                // O Feednami converte o RSS para JSON nativamente e resolve o erro de conexão
+                const url = 'https://br.cointelegraph.com/rss';
+                const endpoint = `https://api.feednami.com/api/v1/public/get?url=${encodeURIComponent(url)}`;
                 
-                const res = await fetch(apiUrl);
-                const data = await res.json();
+                const res = await fetch(endpoint);
+                const json = await res.json();
                 
-                if (data.status === 'ok') {
-                    newsContainer.innerHTML = data.items.map(item => `
+                if (json.meta.code === 200) {
+                    const entries = json.entries.slice(0, 10);
+                    newsContainer.innerHTML = entries.map(item => `
                         <div class="mb-2 pb-2 border-b border-[#111] cursor-pointer hover:bg-[#ffffff05] transition-all" 
                              onclick="window.open('${item.link}', '_blank')">
                             <div class="text-[10px] text-gray-200 font-bold mb-0.5 leading-tight">${item.title}</div>
@@ -241,13 +242,14 @@
                         </div>
                     `).join('');
                 } else {
-                    throw new Error("Falha no status da API");
+                    throw new Error("API Limit");
                 }
             } catch (e) {
                 console.error("Erro no Feed:", e);
-                newsContainer.innerHTML = '<div class="text-[10px] text-center py-4 text-[#444]">CONEXÃO NEWS OFFLINE - TENTANDO RECONECTAR...</div>';
-                // Tenta novamente em 10 segundos se falhar
-                setTimeout(fetchNews, 10000);
+                newsContainer.innerHTML = '<div class="text-[10px] text-center py-4 text-[#444]">RECONECTANDO AO FEED...</div>';
+                setTimeout(fetchNews, 15000); // Tenta novamente em 15s
+            }
+        }
             }
         }
 
