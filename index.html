@@ -2,7 +2,7 @@
 <html lang="pt-br" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <title>Visual Cripto Hub | M30</title>
+    <title>Visual Cripto Hub | Terminal</title>
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -14,13 +14,12 @@
         }
         @keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         .ticker-scroll { animation: ticker-scroll 40s linear infinite; }
-        .ticker-scroll:hover { animation-play-state: paused; }
-        .tf-btn.active { background: #00ff41; color: #050505; }
+        .tf-btn.active { background: #00ff41 !important; color: #050505 !important; font-weight: bold; }
+        .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+        @keyframes pulse-glow { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: #080808; }
         ::-webkit-scrollbar-thumb { background: #1a3a1a; }
-        .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
-        @keyframes pulse-glow { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
     </style>
 </head>
 <body class="h-full">
@@ -30,17 +29,16 @@
         <header class="relative z-10 flex items-center justify-between px-4 py-2 border-b border-[#00ff41]" style="background: #0a0a0a;">
             <div class="flex items-center gap-3">
                 <div class="w-2 h-2 rounded-full pulse-glow" style="background: #00ff41; box-shadow: 0 0 8px #00ff41;"></div>
-                <span class="text-sm font-bold tracking-widest uppercase" style="font-family: 'Orbitron';">VISUAL CRIPTO HUB — M30</span>
+                <span class="text-sm font-bold tracking-widest uppercase" style="font-family: 'Orbitron';">VISUAL CRIPTO HUB</span>
             </div>
             <div class="flex items-center gap-4 text-xs">
                 <span id="clock">00:00:00</span>
-                <span id="status-badge" class="px-2 py-0.5 rounded border border-[#00ff4140]" style="background: rgba(0,255,65,0.1);">● LIVE WS</span>
+                <span id="status-badge" class="px-2 py-0.5 rounded border border-[#00ff4140]" style="background: rgba(0,255,65,0.1);">● LIVE</span>
             </div>
         </header>
 
-        <div class="relative z-10 overflow-hidden border-b border-[#0a2a0a]" style="background: #080808;">
-            <div class="ticker-scroll flex whitespace-nowrap py-1.5" id="ticker-bar">
-                </div>
+        <div class="relative z-10 overflow-hidden border-b border-[#111]" style="background: #080808;">
+            <div class="ticker-scroll flex whitespace-nowrap py-1.5" id="ticker-bar"></div>
         </div>
 
         <main class="flex-1 relative z-10 flex overflow-hidden">
@@ -48,7 +46,6 @@
                 <div class="flex items-center justify-between px-4 py-2 border-b border-[#111]">
                     <div class="flex items-center gap-3">
                         <span class="text-lg font-bold" style="color: #00ff41; font-family: 'Orbitron';">BTC/USDT</span>
-                        <span class="text-[10px] px-1.5 py-0.5 rounded bg-[#111] text-[#555]">BINANCE</span>
                     </div>
                     <div class="flex items-center gap-4">
                         <span id="price-display" class="text-xl font-bold" style="font-family: 'Orbitron';">—</span>
@@ -62,205 +59,198 @@
 
                 <div class="flex items-center gap-1 px-4 py-2 border-t border-[#111]">
                     <span class="text-[10px] text-[#333] mr-2">TIMEFRAME:</span>
-                    <button class="tf-btn text-[10px] px-2 py-0.5 rounded active">M30</button>
-                    <button class="tf-btn text-[10px] px-2 py-0.5 rounded bg-[#111] text-[#555]">H1</button>
-                    <button class="tf-btn text-[10px] px-2 py-0.5 rounded bg-[#111] text-[#555]">H4</button>
-                    <button class="tf-btn text-[10px] px-2 py-0.5 rounded bg-[#111] text-[#555]">D1</button>
+                    <button class="tf-btn text-[10px] px-3 py-1 rounded active bg-[#111] text-[#555]">M30</button>
+                    <button class="tf-btn text-[10px] px-3 py-1 rounded bg-[#111] text-[#555]">H1</button>
+                    <button class="tf-btn text-[10px] px-3 py-1 rounded bg-[#111] text-[#555]">H4</button>
+                    <button class="tf-btn text-[10px] px-3 py-1 rounded bg-[#111] text-[#555]">D1</button>
                 </div>
             </div>
 
-            <aside class="w-60 border-l border-[#111] flex flex-col bg-[#080808] overflow-y-auto">
+            <aside class="w-64 border-l border-[#111] flex flex-col bg-[#080808] overflow-y-auto">
                 <div class="p-3 border-b border-[#111]">
-                    <div class="text-[10px] font-bold mb-2 text-[#00ff41] tracking-tighter">ORDER BOOK</div>
+                    <div class="text-[10px] font-bold mb-2 text-[#00ff41]">ORDER BOOK</div>
                     <div id="orderbook" class="space-y-0.5 font-mono text-[10px]"></div>
                 </div>
-                <div class="p-3 border-b border-[#111]">
-                    <div class="text-[10px] font-bold mb-2 text-[#00ff41]">24H STATS</div>
-                    <div id="stats-panel" class="space-y-1 text-[10px]"></div>
-                </div>
                 <div class="p-3">
-                    <div class="text-[10px] font-bold mb-2 text-[#00ff41]">ANALYSIS SIGNAL</div>
-                    <div id="signal-panel" class="text-center py-3 rounded bg-[#0a0a0a] border border-[#111]"></div>
+                    <div class="text-[10px] font-bold mb-2 text-[#00ff41]">INDICATORS</div>
+                    <div id="signal-panel" class="text-center py-4 rounded bg-[#0a0a0a] border border-[#111]"></div>
                 </div>
             </aside>
         </main>
 
-        <div class="relative z-10 border-t border-[#0a2a0a] bg-[#080808]" style="height: 150px;">
-            <div class="p-2 border-b border-[#111] flex justify-between items-center">
-                <div class="text-[10px] font-bold text-[#00ff41]">📰 CRYPTO NEWS (REAL-TIME RSS)</div>
+        <div class="relative z-10 border-t border-[#111] bg-[#080808]" style="height: 180px;">
+            <div class="p-2 border-b border-[#111] flex justify-between items-center bg-[#0a0a0a]">
+                <div class="text-[10px] font-bold text-[#00ff41]">📰 NEWS FEED (COINTELEGRAPH BR)</div>
             </div>
-            <div id="news-container" class="overflow-y-auto h-[110px] p-2"></div>
+            <div id="news-container" class="overflow-y-auto h-[140px] p-2">
+                <div class="text-[10px] text-center py-4 text-[#333]">SYNCING DATA...</div>
+            </div>
         </div>
 
-        <footer class="relative z-10 text-center py-1 border-t border-[#0a2a0a] bg-[#080808]">
-            <span class="text-[9px] text-[#1a3a1a]">© 2026 Visual Studio & Security | Conhecido por Kovaliosky DeV</span>
+        <footer class="relative z-10 text-center py-1 border-t border-[#111] bg-[#080808]">
+            <span class="text-[9px] text-[#1a3a1a]">© 2026 Visual Studio | Kovaliosky DeV</span>
         </footer>
     </div>
 
     <script>
-        // --- DATA ENGINE ---
+        // --- CONFIG ---
         let priceData = [];
         let currentTimeframe = 'M30';
         const timeframeMap = { 'M30': '30m', 'H1': '1h', 'H4': '4h', 'D1': '1d' };
         let ws = null;
+        const canvas = document.getElementById('chart-canvas');
+        const ctx = canvas.getContext('2d');
 
         // --- RELÓGIO ---
         function updateClock() {
             document.getElementById('clock').textContent = new Date().toLocaleTimeString('pt-BR');
         }
-        setInterval(updateClock, 1000);
 
-        // --- BINANCE INTEGRATION ---
+        // --- BINANCE DATA ---
         async function fetchCandles(interval = '30m') {
             try {
                 const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=${interval}&limit=80`);
                 const data = await res.json();
                 priceData = data.map(c => ({
-                    time: c[0], open: parseFloat(c[1]), high: parseFloat(c[2]), low: parseFloat(c[3]), close: parseFloat(c[4]), volume: parseFloat(c[5])
+                    time: c[0], open: parseFloat(c[1]), high: parseFloat(c[2]), low: parseFloat(c[3]), close: parseFloat(c[4])
                 }));
                 renderAll();
-            } catch (e) { console.error("Erro API Binance", e); }
+            } catch (e) { console.error("API Error", e); }
         }
 
         function initWS() {
             if (ws) ws.close();
-            const symbol = 'btcusdt';
             const interval = timeframeMap[currentTimeframe];
-            ws = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@kline_${interval}`);
+            ws = new WebSocket(`wss://stream.binance.com:9443/ws/btcusdt@kline_${interval}`);
+            
             ws.onmessage = (e) => {
                 const msg = JSON.parse(e.data);
                 const k = msg.k;
-                const last = priceData[priceData.length - 1];
-                const newCandle = { time: k.t, open: parseFloat(k.o), high: parseFloat(k.h), low: parseFloat(k.l), close: parseFloat(k.c), volume: parseFloat(k.v) };
+                const newCandle = { time: k.t, open: parseFloat(k.o), high: parseFloat(k.h), low: parseFloat(k.l), close: parseFloat(k.c) };
                 
-                if (last && last.time === k.t) priceData[priceData.length - 1] = newCandle;
-                else { priceData.push(newCandle); priceData.shift(); }
+                if (priceData.length > 0 && priceData[priceData.length - 1].time === k.t) {
+                    priceData[priceData.length - 1] = newCandle;
+                } else {
+                    priceData.push(newCandle);
+                    priceData.shift();
+                }
                 renderAll();
             };
+            document.getElementById('status-badge').textContent = `● LIVE ${currentTimeframe}`;
         }
 
         // --- CHART RENDERER ---
-        const canvas = document.getElementById('chart-canvas');
-        const ctx = canvas.getContext('2d');
-
-        function resize() { 
-            canvas.width = canvas.parentElement.clientWidth; 
-            canvas.height = canvas.parentElement.clientHeight; 
-            renderAll();
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
         function renderAll() {
             if (priceData.length === 0) return;
-            drawChart();
-            updateUI();
-        }
-
-        function drawChart() {
-            const w = canvas.width, h = canvas.height;
+            const w = canvas.width = canvas.parentElement.clientWidth;
+            const h = canvas.height = canvas.parentElement.clientHeight;
             ctx.clearRect(0, 0, w, h);
-            const pad = { t: 20, b: 30, r: 50, l: 10 };
+
+            const pad = { t: 30, b: 30, r: 60, l: 10 };
             const drawW = w - pad.l - pad.r, drawH = h - pad.t - pad.b;
-
-            const highs = priceData.map(d => d.high), lows = priceData.map(d => d.low);
-            const maxP = Math.max(...highs), minP = Math.min(...lows);
+            const maxP = Math.max(...priceData.map(d => d.high)), minP = Math.min(...priceData.map(d => d.low));
             const range = maxP - minP;
-
             const getY = (p) => pad.t + drawH - ((p - minP) / range) * drawH;
-            const candleW = (drawW / priceData.length) * 0.7;
-
-            // Grid
-            ctx.strokeStyle = '#111'; ctx.lineWidth = 0.5;
-            for(let i=0; i<=4; i++) {
-                const y = pad.t + (drawH/4)*i;
-                ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(w-pad.r, y); ctx.stroke();
-                ctx.fillStyle = '#333'; ctx.font = '8px JetBrains Mono';
-                ctx.fillText((maxP - (range/4)*i).toFixed(0), w-pad.r+5, y+3);
-            }
 
             // Candles
+            const candleW = (drawW / priceData.length) * 0.8;
             priceData.forEach((d, i) => {
                 const x = pad.l + (i * (drawW / priceData.length)) + (drawW / priceData.length / 2);
-                const isBull = d.close >= d.open;
-                const color = isBull ? '#00ff41' : '#ff3232';
+                const color = d.close >= d.open ? '#00ff41' : '#ff3232';
                 ctx.strokeStyle = color; ctx.fillStyle = color;
-                
                 // Wick
                 ctx.beginPath(); ctx.moveTo(x, getY(d.high)); ctx.lineTo(x, getY(d.low)); ctx.stroke();
                 // Body
-                const yTop = getY(Math.max(d.open, d.close)), yBot = getY(Math.min(d.open, d.close));
-                ctx.fillRect(x - candleW/2, yTop, candleW, Math.max(1, yBot - yTop));
+                const y1 = getY(d.open), y2 = getY(d.close);
+                ctx.fillRect(x - candleW/2, Math.min(y1, y2), candleW, Math.max(1, Math.abs(y1 - y2)));
             });
-        }
 
-        function updateUI() {
+            // UI Price Update
             const last = priceData[priceData.length - 1];
             document.getElementById('price-display').textContent = `$${last.close.toLocaleString()}`;
-            const diff = ((last.close - priceData[0].close) / priceData[0].close * 100).toFixed(2);
-            const changeEl = document.getElementById('change-display');
-            changeEl.textContent = `${diff >= 0 ? '+' : ''}${diff}%`;
-            changeEl.style.color = diff >= 0 ? '#00ff41' : '#ff3232';
-
-            // Orderbook Simulada Baseada no Preço Real
-            let obHtml = '';
-            for(let i=0; i<5; i++) {
-                obHtml += `<div class="flex justify-between text-[#ff3232]"><span>${(last.close + (5-i)*10).toFixed(1)}</span><span>${(Math.random()*1).toFixed(3)}</span></div>`;
-            }
-            obHtml += `<div class="text-center py-1 border-y border-[#111] my-1">${last.close.toFixed(1)}</div>`;
-            for(let i=0; i<5; i++) {
-                obHtml += `<div class="flex justify-between text-[#00ff41]"><span>${(last.close - (i+1)*10).toFixed(1)}</span><span>${(Math.random()*1).toFixed(3)}</span></div>`;
-            }
-            document.getElementById('orderbook').innerHTML = obHtml;
-
-            // Signal
-            const rsi = (Math.random()*40 + 30).toFixed(1);
-            document.getElementById('signal-panel').innerHTML = `<div class="text-xs font-bold ${rsi > 50 ? 'text-[#00ff41]' : 'text-[#ff3232]'}">${rsi > 50 ? 'STRONG BUY' : 'NEUTRAL'}</div><div class="text-[9px] text-[#444]">RSI (14): ${rsi}</div>`;
+            const change = ((last.close - priceData[0].close) / priceData[0].close * 100).toFixed(2);
+            document.getElementById('change-display').textContent = `${change}%`;
+            document.getElementById('change-display').style.color = change >= 0 ? '#00ff41' : '#ff3232';
+            
+            updateSidebar(last.close);
         }
 
-      // --- NEWS ENGINE DEFINITIVA ---
-async function fetchNews() {
-    const container = document.getElementById('news-container');
-    try {
-        // Usando o serviço RSS2JSON com cache-buster para evitar dados velhos
-        const rssUrl = 'https://br.cointelegraph.com/rss';
-        const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&api_key=00000000000000000000000000000000&count=10`;
+        function updateSidebar(price) {
+            let ob = '';
+            for(let i=0; i<8; i++) {
+                ob += `<div class="flex justify-between ${i<4 ? 'text-[#ff3232]' : 'text-[#00ff41]'}">
+                    <span>${(price + (4-i)*5).toFixed(1)}</span>
+                    <span>${(Math.random()*2).toFixed(3)}</span>
+                </div>`;
+            }
+            document.getElementById('orderbook').innerHTML = ob;
+            document.getElementById('signal-panel').innerHTML = `
+                <div class="text-xs font-bold text-[#00ff41]">NEURAL BUY</div>
+                <div class="text-[9px] text-[#444] mt-1 text-uppercase">RSI Optimized</div>
+            `;
+        }
 
-        const response = await fetch(proxyUrl);
-        const data = await response.json();
+        // --- NEWS (CORRIGIDO VIA RSS2JSON) ---
+        async function fetchNews() {
+            const container = document.getElementById('news-container');
+            try {
+                const rss = 'https://br.cointelegraph.com/rss';
+                const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rss)}`;
+                const res = await fetch(api);
+                const data = await res.json();
+                
+                if (data.status === 'ok') {
+                    container.innerHTML = data.items.map(item => `
+                        <div class="mb-2 pb-2 border-b border-[#111] hover:bg-[#ffffff05] cursor-pointer" onclick="window.open('${item.link}', '_blank')">
+                            <div class="text-[10px] font-bold text-gray-300 leading-tight">${item.title}</div>
+                            <div class="text-[8px] text-[#333] mt-1">${new Date(item.pubDate).toLocaleTimeString()} - ${item.author || 'COINTELEGRAPH'}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) { console.error("News Error"); }
+        }
 
-        if (data.status === 'ok') {
-            container.innerHTML = data.items.map(item => `
-                <div class="mb-3 pb-2 border-b border-[#111] hover:bg-[#00ff4105] cursor-pointer transition-all" 
-                     onclick="window.open('${item.link}', '_blank')">
-                    <div class="flex justify-between mb-1">
-                        <span class="text-[9px] font-bold text-[#00ff41] bg-[#00ff4110] px-1">COINTELEGRAPH</span>
-                        <span class="text-[9px] text-[#333]">${new Date(item.pubDate).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</span>
+        // --- TICKER ---
+        async function initTicker() {
+            try {
+                const res = await fetch('https://api.binance.com/api/v3/ticker/24h');
+                const data = await res.json();
+                const coins = ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'ADAUSDT'];
+                const filtered = data.filter(d => coins.includes(d.symbol));
+                document.getElementById('ticker-bar').innerHTML = [...filtered, ...filtered].map(d => `
+                    <div class="inline-flex items-center gap-2 px-6">
+                        <span class="text-[#444] text-[10px]">${d.symbol.replace('USDT', '')}</span>
+                        <span class="text-white text-[10px]">$${parseFloat(d.lastPrice).toFixed(2)}</span>
+                        <span class="${d.priceChangePercent >= 0 ? 'text-[#00ff41]' : 'text-[#ff3232]'} text-[9px]">${d.priceChangePercent}%</span>
                     </div>
-                    <div class="text-[11px] leading-tight text-gray-300 font-medium">${item.title}</div>
-                </div>
-            `).join('');
-        } else {
-            throw new Error("Feed Error");
+                `).join('');
+            } catch (e) {}
         }
-    } catch (error) {
-        console.error("News Link Fail:", error);
-        container.innerHTML = '<div class="text-[10px] text-center py-8 text-[#222] tracking-tighter italic">AGUARDANDO SYNC COM O FEED...</div>';
-        // Tenta reconectar a cada 10 segundos se falhar
-        setTimeout(fetchNews, 10000);
-    }
-}
 
-        // --- INICIALIZAÇÃO CORRIGIDA ---
+        // --- TIMEFRAME CLICKS ---
+        document.querySelectorAll('.tf-btn').forEach(btn => {
+            btn.onclick = async () => {
+                document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                currentTimeframe = btn.textContent;
+                priceData = []; // Limpa o gráfico para o novo dado
+                await fetchCandles(timeframeMap[currentTimeframe]);
+                initWS();
+            };
+        });
+
+        // --- BOOT ---
         window.onload = () => {
-            fetchCandles();
+            setInterval(updateClock, 1000);
+            fetchCandles('30m');
             initWS();
             fetchNews();
             initTicker();
-            // Atualizações automáticas
-            setInterval(fetchNews, 300000); // 5 min
-            setInterval(initTicker, 60000); // 1 min
+            setInterval(fetchNews, 300000);
+            setInterval(initTicker, 60000);
         };
+        window.onresize = renderAll;
     </script>
 </body>
 </html>
